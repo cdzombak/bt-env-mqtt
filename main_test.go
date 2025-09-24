@@ -107,7 +107,7 @@ func TestLoadConfig(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer removeTempFile(tmpfile)
+	defer func() { _ = removeTempFile(tmpfile) }()
 
 	config, err := loadConfig(tmpfile)
 	if err != nil {

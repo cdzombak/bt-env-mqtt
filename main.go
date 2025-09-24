@@ -30,6 +30,11 @@ type BluetoothDevice struct {
 	RSSI    int
 }
 
+var (
+	deviceNameRegex = regexp.MustCompile(`^[[:space:]]{10}[^:]+:$`)
+	macAddressRegex = regexp.MustCompile(`[0-9A-Fa-f:]+`)
+)
+
 var version = "dev"
 
 func loadConfig(filename string) (*Config, error) {
@@ -65,7 +70,7 @@ func parseBluetoothOutput(output string) ([]BluetoothDevice, error) {
 
 	for _, line := range lines {
 		// Match device names (indented lines ending with colon)
-		if matched, _ := regexp.MatchString(`^[[:space:]]{10}[^:]+:$`, line); matched {
+		if deviceNameRegex.MatchString(line) {
 			// Skip system entries
 			if !strings.Contains(line, "Bluetooth") && !strings.Contains(line, "Controller") &&
 			   !strings.Contains(line, "Features") && !strings.Contains(line, "Services") &&
@@ -80,11 +85,8 @@ func parseBluetoothOutput(output string) ([]BluetoothDevice, error) {
 			parts := strings.Split(line, ":")
 			if len(parts) >= 2 {
 				addrPart := strings.TrimSpace(strings.Join(parts[1:], ":"))
-				if matched, _ := regexp.MatchString(`[0-9A-Fa-f:]+`, addrPart); matched {
-					re := regexp.MustCompile(`[0-9A-Fa-f:]+`)
-					if match := re.FindString(addrPart); match != "" {
-						currentAddress = match
-					}
+				if match := macAddressRegex.FindString(addrPart); match != "" {
+					currentAddress = match
 				}
 			}
 		}

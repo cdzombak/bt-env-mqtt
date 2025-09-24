@@ -13,13 +13,13 @@ func createTempFile(name, content string) (string, error) {
 	}
 
 	if _, err := tmpfile.Write([]byte(content)); err != nil {
-		tmpfile.Close()
-		os.Remove(tmpfile.Name())
+		_ = tmpfile.Close()
+		_ = os.Remove(tmpfile.Name())
 		return "", err
 	}
 
 	if err := tmpfile.Close(); err != nil {
-		os.Remove(tmpfile.Name())
+		_ = os.Remove(tmpfile.Name())
 		return "", err
 	}
 
