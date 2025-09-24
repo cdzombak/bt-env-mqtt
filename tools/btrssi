@@ -1,0 +1,73 @@
+#!/bin/bash
+
+# btrssi - List nearby Bluetooth devices sorted by signal strength (RSSI)
+# Higher RSSI values indicate stronger signal / closer distance
+
+echo "Scanning for Bluetooth devices..."
+
+# Extract device names, addresses, and RSSI values from system_profiler output
+system_profiler SPBluetoothDataType 2>/dev/null | \
+awk '
+/^[[:space:]]{10}[^:]+:$/ {
+    # Match device names (indented lines ending with colon)
+    if ($0 !~ /Bluetooth|Controller|Features|Services|Connected|Not Connected/) {
+        device = $0
+        gsub(/^[[:space:]]+/, "", device)  # Remove leading spaces
+        gsub(/:$/, "", device)             # Remove trailing colon
+        address = ""  # Reset address for this device
+    }
+}
+/Address:/ {
+    # Extract MAC address
+    if (device != "" && match($0, /Address:[[:space:]]*([0-9A-Fa-f:]+)/)) {
+        # Find the MAC address part after "Address:"
+        addr_start = index($0, ":") + 1  # Find first colon (from "Address:")
+        addr_line = substr($0, addr_start)
+        gsub(/^[[:space:]]*/, "", addr_line)  # Remove leading spaces
+        if (match(addr_line, /[0-9A-Fa-f:]+/)) {
+            address = substr(addr_line, RSTART, RLENGTH)
+        }
+    }
+}
+/RSSI:/ {
+    # Extract RSSI value when we find one
+    if (device != "" && match($0, /-?[0-9]+/)) {
+        rssi = substr($0, RSTART, RLENGTH)
+        addr_display = (address != "") ? address : "Unknown"
+        print device "|" rssi "|" addr_display
+        device = ""  # Reset for next device
+        address = ""
+    }
+}
+' | \
+sort -t'|' -k2,2nr |  # Sort by RSSI (higher = closer)
+(
+    echo ""
+    echo "Nearby Bluetooth devices (sorted by signal strength):"
+    echo ""
+    printf "%-30s %-6s %s\n" "Device Name" "RSSI" "Address"
+    echo "----------------------------------------------------------------------"
+
+    count=0
+    while IFS='|' read -r name rssi address; do
+        # Truncate very long device names
+        if [ ${#name} -gt 29 ]; then
+            name="${name:0:26}..."
+        fi
+
+        printf "%-30s %-6s %s\n" "$name" "$rssi" "$address"
+        count=$((count + 1))
+    done
+
+    if [ $count -eq 0 ]; then
+        echo "No devices found with RSSI data."
+        echo ""
+        echo "This might happen if:"
+        echo "- No devices are currently visible to your Mac"
+        echo "- Bluetooth is turned off"
+        echo "- No devices are actively connected or recently seen"
+    else
+        echo ""
+        echo "Found $count devices. Higher RSSI = stronger signal/closer distance."
+    fi
+)

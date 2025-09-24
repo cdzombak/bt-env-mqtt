@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.dzombak.bluetooth-env-mqtt</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/opt/homebrew/bin/bt-env-mqtt</string>
+		<string>/Users/ME/.config/bt-env-mqtt.yaml</string>
+	</array>
+	<key>StartInterval</key>
+	<integer>90</integer>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>UserName</key>
+	<string>ME</string>
+	<key>GroupName</key>
+	<string>staff</string>
+	<key>InitGroups</key>
+	<true/>
+	<key>StandardOutPath</key>
+	<string>/var/log/bt-env-mqtt.log</string>
+	<key>StandardErrorPath</key>
+	<string>/var/log/bt-env-mqtt.log</string>
+</dict>
+</plist>

@@ -1,0 +1,7 @@
+# Example configuration file for bt-env-mqtt
+mqtt:
+  server: "localhost"
+  port: 1883
+  username: ""
+  password: ""
+  root_topic: "bluetooth"
