@@ -4,7 +4,16 @@ A macOS tool that scans for nearby Bluetooth devices and publishes their RSSI (s
 
 ## Installation
 
-TK
+### Homebrew
+
+```shell
+brew install cdzombak/oss/bt-env-mqtt
+```
+
+### Manual from build artifacts
+
+Pre-built binaries for macOS on Intel and Apple Silicon are downloadable from each [GitHub Release](https://github.com/cdzombak/bt-env-mqtt/releases).
+
 
 ## Usage
 

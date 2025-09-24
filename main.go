@@ -30,6 +30,8 @@ type BluetoothDevice struct {
 	RSSI    int
 }
 
+var version = "dev"
+
 func loadConfig(filename string) (*Config, error) {
 	data, err := os.ReadFile(filename)
 	if err != nil {
@@ -148,9 +150,39 @@ func publishToMQTT(config *Config, devices []BluetoothDevice) error {
 	return nil
 }
 
+func showUsage() {
+	fmt.Printf("bt-env-mqtt %s - Scan for Bluetooth devices and publish to MQTT\n\n", version)
+	fmt.Printf("USAGE:\n")
+	fmt.Printf("  %s <config-file>\n", os.Args[0])
+	fmt.Printf("  %s -version\n", os.Args[0])
+	fmt.Printf("  %s -help\n\n", os.Args[0])
+	fmt.Printf("DESCRIPTION:\n")
+	fmt.Printf("  Scans for nearby Bluetooth devices using system_profiler and publishes\n")
+	fmt.Printf("  their RSSI (signal strength) and names to MQTT topics.\n\n")
+	fmt.Printf("  For each discovered device, publishes to:\n")
+	fmt.Printf("    <root_topic>/<device_MAC_address>/rssi - Signal strength\n")
+	fmt.Printf("    <root_topic>/<device_MAC_address>/name - Device name\n\n")
+	fmt.Printf("CONFIG FILE:\n")
+	fmt.Printf("  YAML file with MQTT broker settings. See config.yaml.example.\n\n")
+	fmt.Printf("EXIT CODES:\n")
+	fmt.Printf("  0 - Success\n")
+	fmt.Printf("  1 - Error (configuration, MQTT connection, etc.)\n")
+}
+
 func main() {
+	if len(os.Args) == 2 {
+		switch os.Args[1] {
+		case "-version", "--version":
+			fmt.Println(version)
+			os.Exit(0)
+		case "-help", "--help", "-h":
+			showUsage()
+			os.Exit(0)
+		}
+	}
+
 	if len(os.Args) != 2 {
-		fmt.Fprintf(os.Stderr, "Usage: %s <config-file>\n", os.Args[0])
+		showUsage()
 		os.Exit(1)
 	}
 

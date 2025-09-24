@@ -20,6 +20,7 @@ go.work
 # Build products
 bt-env-mqtt
 bt-env-mqtt.exe
+out/
 
 # Configuration files (contain sensitive data)
 config.yaml
