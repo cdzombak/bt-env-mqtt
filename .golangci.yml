@@ -1,5 +1,9 @@
 version: "2"
 
-run:
-  skip-files:
-    - "*_test.go"
+linters:
+  exclusions:
+    rules:
+      - path: _test\.go
+        linters:
+          - errcheck
+          - staticcheck
